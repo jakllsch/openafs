@@ -16,17 +16,17 @@
 int
 osi_TryEvictVCache(struct vcache *avc, int *slept, int defersleep)
 {
-    int code;
-
-    /* Perhaps this function should use vgone() or vrecycle() instead. */
+    int code = 0;
 
     if ((afs_debug & AFSDEB_GENERAL) != 0) {
 	printf("%s enter\n", __func__);
     }
 
-    if (osi_VM_FlushVCache(avc, slept) != 0) {
-	code = 0;
-    } else {
+    if (!VREFCOUNT_GT(avc,0)
+        && avc->opens == 0 && (avc->f.states & CUnlinkedDel) == 0) {
+        AFS_GUNLOCK();
+        vgone(AFSTOV(avc));
+        AFS_GLOCK();
 	code = 1;
     }
 

@@ -475,6 +475,9 @@ fortuna_reseed(void)
 	}
     }
 #endif
+#if defined(__NetBSD__) && defined(_KERNEL)
+#undef HAVE_ARC4RANDOM
+#endif
 #ifdef HAVE_ARC4RANDOM
     {
 	uint32_t buf[INIT_BYTES / sizeof(uint32_t)];

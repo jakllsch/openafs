@@ -666,7 +666,7 @@ rxi_GetIFInfo(void)
 	if (i >= ADDRSPERSITE)
 	    break;
 #elif defined(AFS_OBSD_ENV) || defined(AFS_NBSD_ENV)
-    for (ifn = ifnet.tqh_first; i < ADDRSPERSITE && ifn != NULL;
+    for (ifn = ifnet_list.tqh_first; i < ADDRSPERSITE && ifn != NULL;
 	 ifn = ifn->if_list.tqe_next) {
 #else
     for (ifn = ifnet; ifn != NULL && i < ADDRSPERSITE; ifn = ifn->if_next) {

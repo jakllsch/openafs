@@ -23,6 +23,7 @@
 #define AFS_DIRENT 1
 
 #include <sys/lock.h>
+#include <sys/vnode.h>
 #if defined(AFS_NBSD50_ENV)
 #include <sys/kmem.h>
 #include <sys/specificdata.h>
@@ -52,9 +53,11 @@ typedef char * caddr_t;
 #define v_vfsp		v_mount
 
 /* vnode */
-#define VN_HOLD(vp)	(vget(vp, 0))
+#define VN_HOLD(vp)	(nbsd_vnhold(vp))
 #define VN_RELE(vp)	(vrele(vp))
-#define osi_vnhold(avc, r) (VN_HOLD(AFSTOV(avc)))
+#define osi_vnhold(avc, r) nbsd_vnhold(AFSTOV(avc))
+
+void nbsd_vnhold(struct vnode *vp);
 
 #define va_nodeid	va_fileid
 

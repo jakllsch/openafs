@@ -119,6 +119,8 @@ Afscall_icl(long opcode, long p1, long p2, long p3, long p4, long *retval)
 int
 #ifdef AFS_DARWIN100_ENV
 Afscall64_icl(int opcode, user_addr_t kp1, user_addr_t kp2, user_addr_t kp3, user_addr_t kp4, int *retval)
+#elif defined(AFS_NBSD70_ENV)
+Afscall_icl(long opcode, long p1, long p2, long p3, long p4, register_t *retval)
 #else
 Afscall_icl(long opcode, long p1, long p2, long p3, long p4, long *retval)
 #endif

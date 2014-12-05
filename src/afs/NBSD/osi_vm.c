@@ -56,8 +56,10 @@ osi_VM_FlushVCache(struct vcache *avc, int *slept)
     }
 
     AFS_GUNLOCK();
+#ifdef AFS_USE_NBSD_NAMECACHE
     cache_purge(vp);
-    vflushbuf(vp, 1);
+#endif
+    vinvalbuf(vp, 0, curlwp->l_cred, curlwp, false, 0);
     AFS_GLOCK();
 
     if ((afs_debug & AFSDEB_VNLAYER) != 0) {
@@ -84,7 +86,11 @@ osi_VM_StoreAllSegments(struct vcache *avc)
     ReleaseWriteLock(&avc->lock);
     AFS_GUNLOCK();
     vp = AFSTOV(avc);
+#if defined(AFS_NBSD60_ENV)
+    mutex_enter(vp->v_interlock);
+#else
     mutex_enter(&vp->v_interlock);
+#endif
     VOP_PUTPAGES(vp, 0, 0, PGO_ALLPAGES|PGO_CLEANIT|PGO_SYNCIO);
     AFS_GLOCK();
     ObtainWriteLock(&avc->lock, 94);
@@ -136,8 +142,10 @@ osi_VM_FlushPages(struct vcache *avc, afs_ucred_t *credp)
 	return;
     }
 
+#ifdef AFS_USE_NBSD_NAMECACHE
     cache_purge(vp);
-    vinvalbuf(vp, 0, credp, curlwp, false, 1);
+#endif
+    vinvalbuf(vp, 0, credp, curlwp, false, 0);
 
     if ((afs_debug & AFSDEB_VNLAYER) != 0) {
 	printf("%s exit\n", __func__);

@@ -158,6 +158,9 @@ struct vfsops afs_vfsops = {
     afs_statvfs,
     afs_sync,
     (void *) eopnotsupp,	/* vfs_vget */
+#ifdef AFS_NBSD70_ENV
+    afs_loadvnode,
+#endif
     (void *) eopnotsupp,	/* vfs_fhtovp */
     (void *) eopnotsupp,	/* vfs_vptofh */
     afs_init,
@@ -396,6 +399,8 @@ tryagain:
     }
     AFS_GUNLOCK();
 
+    KASSERT(VOP_ISLOCKED(*vpp));
+
     if ((afs_debug & AFSDEB_VNLAYER) != 0) {
 	afs_warn("afs_root exit\n");
     }
@@ -436,6 +441,14 @@ afs_sync(struct mount *mp, int waitfor, kauth_cred_t cred)
     /* Can't do this in OpenBSD 2.7, it faults when called from apm_suspend() */
     store_dirty_vcaches();
 #endif
+    return 0;
+}
+
+int
+afs_loadvnode(struct mount *mp, struct vnode *vp,
+    const void *key, size_t key_len, const void **new_key)
+{
+    panic(__func__);
     return 0;
 }
 

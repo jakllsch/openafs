@@ -16,7 +16,7 @@
 #include <afs/param.h>
 #include <afs/stds.h>
 
-#define DEBUG 0
+//#define DEBUG 0
 #ifdef KERNEL
 #ifndef UKERNEL
 #if defined(AFS_AIX_ENV) || defined(AFS_AUX_ENV) || defined(AFS_SUN5_ENV)

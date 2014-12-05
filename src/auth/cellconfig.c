@@ -985,6 +985,11 @@ afsconf_LookupServer(const char *service, const char *protocol,
     int pass = 0;
     char *IANAname = (char *) afsconf_FindIANAName(service);
     int tservice = afsconf_FindService(service);
+#ifdef __NetBSD__
+    res_state res;
+#else
+#define res (&_res)
+#endif
 
     realCellName = NULL;
 
@@ -997,15 +1002,18 @@ afsconf_LookupServer(const char *service, const char *protocol,
 	pass += 2;
 
 #ifdef HAVE_RES_RETRANSRETRY
-    if ((_res.options & RES_INIT) == 0 && res_init() == -1)
+#ifdef __NetBSD__
+    res = __res_get_state();
+#else
+    if ((res->options & RES_INIT) == 0 && res_init() == -1)
       return (0);
-
+#endif
     /*
      * Rx timeout is typically 56 seconds; limit user experience to
      * similar timeout
      */
-    _res.retrans = 18;
-    _res.retry = 3;
+    res->retrans = 18;
+    res->retry = 3;
 #endif
 
  retryafsdb:
@@ -1031,9 +1039,13 @@ afsconf_LookupServer(const char *service, const char *protocol,
     if (r < 0 || dotcellname == NULL)
 	goto findservererror;
 
+#ifdef __NetBSD__
+    len = res_nsearch(res, dotcellname, C_IN, dnstype, answer, sizeof(answer));
+#else
     LOCK_GLOBAL_MUTEX;
     len = res_search(dotcellname, C_IN, dnstype, answer, sizeof(answer));
     UNLOCK_GLOBAL_MUTEX;
+#endif
 
     if (dotcellname != NULL) {
 	free(dotcellname);

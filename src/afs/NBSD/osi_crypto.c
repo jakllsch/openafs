@@ -25,6 +25,9 @@
 #include <afsconfig.h>
 #include "afs/param.h"
 
+#include "afs/sysincludes.h"
+#include "afsincludes.h"
+
 #ifdef AFS_NBSD70_ENV
 #include <sys/cprng.h>
 #else
